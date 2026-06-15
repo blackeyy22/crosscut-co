@@ -520,6 +520,15 @@ async function generatePDF(submission, customColors = {}) {
 // ─────────────────────────────────────────
 // EMAIL SENDING with Environment Variables
 // ─────────────────────────────────────────
+
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error("SMTP Verify Error:", error);
+  } else {
+    console.log("SMTP Server Ready");
+  }
+});
+
 async function sendEmail(to, subject, htmlContent, pdfBuffer) {
   try {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
