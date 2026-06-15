@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CROSSCUT Admin Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #080406;
+      --black2: #0e080b;
+      --black3: #130b0e;
+      --red: #8b0000;
+      --red-deep: #5a0000;
+      --red-hot: #c0001a;
+      --gold: #c9a84c;
+      --gold-bright: #f5d780;
+      --cream: #fff4db;
+      --text: #f1e7d4;
+      --text2: #ffffff;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--black);
+      color: var(--text2);
+    }
+
+    /* ─────────────────────────────────────────
+       LOGIN SCREEN
+    ───────────────────────────────────────── */
+    .login-container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--red-deep), var(--black));
+      z-index: 1000;
+    }
+
+    .login-container.hidden {
+      display: none;
+    }
+
+    .login-box {
+      background: var(--black2);
+      border: 1px solid rgba(139, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 60px 40px;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(139, 0, 0, 0.3);
+    }
+
+    .login-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text);
+      margin-bottom: 40px;
+      letter-spacing: 0.1em;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--gold-bright);
+      text-transform: uppercase;
+    }
+
+    .form-group input {
+      padding: 14px 16px;
+      background: rgba(20, 8, 10, 0.8);
+      border: 1px solid rgba(139, 0, 0, 0.5);
+      border-radius: 6px;
+      color: var(--cream);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(201, 168, 76, 0.2);
+    }
+
+    .login-btn {
+      padding: 14px;
+      background: linear-gradient(135deg, var(--red-deep), var(--red));
+      color: var(--gold-bright);
+      border: 1px solid var(--red-hot);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.35s;
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      background: linear-gradient(135deg, var(--red), var(--red-hot));
+      box-shadow: 0 0 30px rgba(192, 0, 26, 0.5);
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    /* ─────────────────────────────────────────
+       DASHBOARD LAYOUT
+    ───────────────────────────────────────── */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+      gap: 0;
+    }
+
+    .dashboard.hidden {
+      display: none;
+    }
+
+    .sidebar {
+      background: var(--black2);
+      border-right: 1px solid rgba(139, 0, 0, 0.3);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .sidebar-logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      padding: 20px;
+      border: 1px solid rgba(139, 0, 0, 0.3);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar-menu li a {
+      display: block;
+      padding: 12px 16px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+      background: rgba(139, 0, 0, 0.1);
+    }
+
+    .sidebar-menu li a:hover,
+    .sidebar-menu li a.active {
+      background: rgba(139, 0, 0, 0.3);
+      color: var(--gold);
+      border-left-color: var(--red-hot);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(139, 0, 0, 0.2);
+    }
+
+    .user-info {
+      font-size: 0.75rem;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: 10px;
+      background: rgba(192, 0, 26, 0.2);
+      border: 1px solid var(--red-hot);
+      color: var(--red-hot);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(192, 0, 26, 0.4);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 30px 40px;
+      overflow-y: auto;
+      background: var(--black);
+    }
+
+    .page-header {
+      margin-bottom: 30px;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .page-subtitle {
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    /* ─────────────────────────────────────────
+       SUBMISSIONS LIST
+    ───────────────────────────────────────── */
+    .submissions-container {
+      display: grid;
+      gap: 20px;
+    }
+
+    .submission-card {
+      background: var(--black2);
+      border: 1px solid rgba(139, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 24px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .submission-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 20px rgba(201, 168, 76, 0.1);
+    }
+
+    .submission-card.selected {
+      border-color: var(--gold);
+      background: var(--black3);
+    }
+
+    .submission-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+
+    .submission-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--cream);
+    }
+
+    .submission-id {
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+
+    .submission-status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .status-pending {
+      background: rgba(192, 26, 0, 0.3);
+      color: #ff9999;
+    }
+
+    .status-replied {
+      background: rgba(201, 168, 76, 0.2);
+      color: var(--gold-bright);
+    }
+
+    .submission-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .detail-label {
+      font-size: 0.75rem;
+      color: var(--gold-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .detail-value {
+      color: var(--text2);
+    }
+
+    .submission-preview {
+      padding: 12px;
+      background: rgba(10, 0, 5, 0.5);
+      border-left: 2px solid var(--gold);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.5;
+      max-height: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .submission-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      background: transparent;
+      color: var(--gold);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .action-btn:hover {
+      background: rgba(201, 168, 76, 0.1);
+      border-color: var(--gold);
+    }
+
+    .action-btn.danger {
+      color: var(--red-hot);
+      border-color: rgba(192, 0, 26, 0.3);
+    }
+
+    .action-btn.danger:hover {
+      background: rgba(192, 0, 26, 0.2);
+      border-color: var(--red-hot);
+    }
+
+    /* ─────────────────────────────────────────
+       MODAL
+    ───────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .modal {
+      background: var(--black2);
+      border: 1px solid rgba(139, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-group-full {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group-full label {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--gold-bright);
+      text-transform: uppercase;
+    }
+
+    .form-group-full input,
+    .form-group-full textarea {
+      padding: 14px 16px;
+      background: rgba(20, 8, 10, 0.8);
+      border: 1px solid rgba(139, 0, 0, 0.5);
+      border-radius: 6px;
+      color: var(--cream);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .form-group-full textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .form-group-full input:focus,
+    .form-group-full textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(201, 168, 76, 0.2);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(139, 0, 0, 0.3);
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .modal-btn-primary {
+      background: linear-gradient(135deg, var(--red-deep), var(--red));
+      color: var(--gold-bright);
+      border-color: var(--red-hot);
+    }
+
+    .modal-btn-primary:hover {
+      box-shadow: 0 0 20px rgba(192, 0, 26, 0.4);
+    }
+
+    .modal-btn-secondary {
+      background: transparent;
+      color: var(--gold);
+      border-color: rgba(201, 168, 76, 0.3);
+    }
+
+    .modal-btn-secondary:hover {
+      background: rgba(201, 168, 76, 0.1);
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      width: auto;
+      accent-color: var(--gold);
+    }
+
+    /* ─────────────────────────────────────────
+       STATS
+    ───────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--black2);
+      border: 1px solid rgba(139, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .message {
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+
+    .message.success {
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.5);
+    }
+
+    .message.error {
+      background: rgba(244, 67, 54, 0.2);
+      color: #ef5350;
+      border: 1px solid rgba(244, 67, 54, 0.5);
+    }
+
+    @media (max-width: 900px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .submission-details {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- LOGIN SCREEN -->
+  <div id="loginContainer" class="login-container">
+    <div class="login-box">
+      <div class="login-title">CROSS<span style="color: var(--red-hot);">.</span>CUT</div>
+      <div class="login-subtitle">ADMIN DASHBOARD</div>
+      <form class="login-form" id="loginForm">
+        <div class="form-group">
+          <label>Admin Password</label>
+          <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+        </div>
+        <button type="submit" class="login-btn">Login</button>
+        <div id="loginError" class="error-msg" style="display: none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="dashboard hidden">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-logo">ADMIN</div>
+      <ul class="sidebar-menu">
+        <li><a href="#" class="menu-item active" data-page="dashboard">Dashboard</a></li>
+        <li><a href="#" class="menu-item" data-page="requests">All Requests</a></li>
+        <li><a href="#" class="menu-item" data-page="settings">Settings</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <div class="user-info">Logged in as Admin</div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <!-- DASHBOARD PAGE -->
+      <div id="dashboardPage" class="page hidden">
+        <div class="page-header">
+          <div class="page-title">Dashboard</div>
+          <div class="page-subtitle">Overview of your project requests</div>
+        </div>
+        <div id="statsContainer" class="stats-grid"></div>
+        <div id="dashboardMessage" class="message" style="display: none;"></div>
+      </div>
+
+      <!-- REQUESTS PAGE -->
+      <div id="requestsPage" class="page hidden">
+        <div class="page-header">
+          <div class="page-title">Project Requests</div>
+          <div class="page-subtitle">View and manage all submissions</div>
+        </div>
+        <div id="submissionsContainer" class="submissions-container"></div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div id="settingsPage" class="page hidden">
+        <div class="page-header">
+          <div class="page-title">Settings</div>
+          <div class="page-subtitle">Manage admin settings</div>
+        </div>
+        <div id="settingsMessage" class="message" style="display: none;"></div>
+        <div style="max-width: 500px;">
+          <div style="background: var(--black2); border: 1px solid rgba(139, 0, 0, 0.3); border-radius: 10px; padding: 24px;">
+            <h3 style="color: var(--gold); margin-bottom: 20px; font-size: 1.1rem; letter-spacing: 0.1em;">Change Admin Password</h3>
+            <form id="changePasswordForm">
+              <div class="form-group-full">
+                <label>Current Password</label>
+                <input type="password" id="currentPassword" placeholder="Enter current password" required>
+              </div>
+              <div class="form-group-full">
+                <label>New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password" required>
+              </div>
+              <div class="form-group-full">
+                <label>Confirm New Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+              </div>
+              <button type="submit" class="modal-btn modal-btn-primary" style="margin-top: 20px; width: 100%;">Update Password</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL FOR REPLY -->
+  <div id="replyModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">Send Reply to Client</div>
+      <div class="modal-body">
+        <div id="clientInfo" style="padding: 12px; background: rgba(139, 0, 0, 0.1); border-radius: 6px; margin-bottom: 16px;">
+          <p style="margin-bottom: 6px;"><strong>Client:</strong> <span id="modalClientName"></span></p>
+          <p><strong>Email:</strong> <span id="modalClientEmail"></span></p>
+        </div>
+        <form id="replyForm">
+          <div class="form-group-full">
+            <label>Your Message</label>
+            <textarea id="replyMessage" placeholder="Write your message to the client..." required></textarea>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" id="includeQuote" checked>
+            <span>Include project quote PDF</span>
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="modal-btn modal-btn-secondary" onclick="closeReplyModal()">Cancel</button>
+            <button type="submit" class="modal-btn modal-btn-primary">Send Reply</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // STATE
+    let currentAdminPassword = '';
+    let submissions = [];
+    let currentPage = 'dashboard';
+
+    // ─────────────────────────────────────────
+    // LOGIN
+    // ─────────────────────────────────────────
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('adminPassword').value;
+
+      try {
+        const response = await fetch('/api/admin/get-submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          currentAdminPassword = password;
+          submissions = data.submissions;
+          showDashboard();
+        } else {
+          showLoginError('Invalid password');
+        }
+      } catch (error) {
+        showLoginError(error.message);
+      }
+    });
+
+    function showLoginError(msg) {
+      const errorEl = document.getElementById('loginError');
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+    }
+
+    function showDashboard() {
+      document.getElementById('loginContainer').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      navigatePage('dashboard');
+    }
+
+    // ─────────────────────────────────────────
+    // NAVIGATION
+    // ─────────────────────────────────────────
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        item.classList.add('active');
+        navigatePage(item.dataset.page);
+      });
+    });
+
+    function navigatePage(page) {
+      currentPage = page;
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+
+      if (page === 'dashboard') {
+        document.getElementById('dashboardPage').classList.remove('hidden');
+        renderDashboard();
+      } else if (page === 'requests') {
+        document.getElementById('requestsPage').classList.remove('hidden');
+        renderRequests();
+      } else if (page === 'settings') {
+        document.getElementById('settingsPage').classList.remove('hidden');
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // DASHBOARD
+    // ─────────────────────────────────────────
+    function renderDashboard() {
+      const total = submissions.length;
+      const pending = submissions.filter(s => s.status === 'pending').length;
+      const replied = submissions.filter(s => s.status === 'replied').length;
+
+      document.getElementById('statsContainer').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-number">${total}</div>
+          <div class="stat-label">Total Requests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${pending}</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${replied}</div>
+          <div class="stat-label">Replied</div>
+        </div>
+      `;
+    }
+
+    // ─────────────────────────────────────────
+    // REQUESTS LIST
+    // ─────────────────────────────────────────
+    function renderRequests() {
+      const container = document.getElementById('submissionsContainer');
+      
+      if (submissions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text); padding: 40px;">No requests yet</p>';
+        return;
+      }
+
+      container.innerHTML = submissions.map(sub => `
+        <div class="submission-card">
+          <div class="submission-header">
+            <div>
+              <div class="submission-name">${sub.name}</div>
+              <div class="submission-id">ID: ${sub.id}</div>
+            </div>
+            <div class="submission-status status-${sub.status}">${sub.status.toUpperCase()}</div>
+          </div>
+          <div class="submission-details">
+            <div class="detail-item">
+              <div class="detail-label">Email</div>
+              <div class="detail-value">${sub.email}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Project Type</div>
+              <div class="detail-value">${sub.projectType}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Amount</div>
+              <div class="detail-value">${sub.amount}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Submitted</div>
+              <div class="detail-value">${new Date(sub.timestamp).toLocaleDateString()}</div>
+            </div>
+          </div>
+          <div class="submission-preview">${sub.message}</div>
+          <div class="submission-actions">
+            <button class="action-btn" onclick="downloadPDF('${sub.id}')">Download PDF</button>
+            <button class="action-btn" onclick="openReplyModal('${sub.id}', '${sub.name}', '${sub.email}')">Reply & Email</button>
+            <button class="action-btn danger" onclick="deleteSubmission('${sub.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ─────────────────────────────────────────
+    // PDF & EMAIL
+    // ─────────────────────────────────────────
+    async function downloadPDF(submissionId) {
+      try {
+        const response = await fetch('/api/admin/get-submission-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            submissionId,
+            adminPassword: currentAdminPassword
+          })
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `quote-${submissionId}.pdf`;
+          a.click();
+        }
+      } catch (error) {
+        alert('Error downloading PDF: ' + error.message);
+      }
+    }
+
+    function openReplyModal(submissionId, clientName, clientEmail) {
+      const sub = submissions.find(s => s.id === submissionId);
+      if (!sub) return;
+
+      window.currentSubmissionId = submissionId;
+      document.getElementById('modalClientName').textContent = clientName;
+      document.getElementById('modalClientEmail').textContent = clientEmail;
+      document.getElementById('replyMessage').value = '';
+      document.getElementById('includeQuote').checked = true;
+      document.getElementById('replyModal').classList.remove('hidden');
+    }
+
+    function closeReplyModal() {
+      document.getElementById('replyModal').classList.add('hidden');
+    }
+
+    document.getElementById('replyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('replyMessage').value;
+      const includeQuote = document.getElementById('includeQuote').checked;
+
+      try {
+        const response = await fetch('/api/admin/send-reply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            submissionId: window.currentSubmissionId,
+            adminPassword: currentAdminPassword,
+            message,
+            includeQuote
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          submissions = submissions.map(s => s.id === window.currentSubmissionId ? data.submission : s);
+          renderRequests();
+          closeReplyModal();
+          showMessage('Reply sent successfully!', 'success');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        alert('Error sending reply: ' + error.message);
+      }
+    });
+
+    async function deleteSubmission(submissionId) {
+      if (!confirm('Are you sure you want to delete this submission?')) return;
+
+      try {
+        const response = await fetch('/api/admin/delete-submission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            submissionId,
+            adminPassword: currentAdminPassword
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          submissions = submissions.filter(s => s.id !== submissionId);
+          renderRequests();
+          showMessage('Submission deleted', 'success');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // SETTINGS
+    // ─────────────────────────────────────────
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        showMessage('Passwords do not match', 'error', 'settingsMessage');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/admin/update-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          currentAdminPassword = newPassword;
+          document.getElementById('changePasswordForm').reset();
+          showMessage('Password updated successfully', 'success', 'settingsMessage');
+        } else {
+          showMessage('Error: ' + data.error, 'error', 'settingsMessage');
+        }
+      } catch (error) {
+        showMessage('Error: ' + error.message, 'error', 'settingsMessage');
+      }
+    });
+
+    // ─────────────────────────────────────────
+    // LOGOUT
+    // ─────────────────────────────────────────
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to logout?')) {
+        currentAdminPassword = '';
+        submissions = [];
+        document.getElementById('dashboard').classList.add('hidden');
+        document.getElementById('loginContainer').classList.remove('hidden');
+        document.getElementById('adminPassword').value = '';
+        document.getElementById('loginError').style.display = 'none';
+      }
+    });
+
+    // ─────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────
+    function showMessage(msg, type, elementId = 'dashboardMessage') {
+      const msgEl = document.getElementById(elementId);
+      msgEl.textContent = msg;
+      msgEl.className = `message ${type}`;
+      msgEl.style.display = 'block';
+      setTimeout(() => {
+        msgEl.style.display = 'none';
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
