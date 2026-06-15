@@ -521,31 +521,33 @@ async function generatePDF(submission, customColors = {}) {
 // EMAIL SENDING with Environment Variables
 // ─────────────────────────────────────────
 
-transporter.verify(function(error, success) {
-  if (error) {
-    console.error("SMTP Verify Error:", error);
-  } else {
-    console.log("SMTP Server Ready");
-  }
-});
-
 async function sendEmail(to, subject, htmlContent, pdfBuffer) {
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error('❌ Email credentials not configured');
-      console.error('   Set EMAIL_USER and EMAIL_PASS in .env file');
-      console.error('   Run: node EMAIL-DIAGNOSTIC.js to verify setup');
-      return false;
-    }
+    console.log("EMAIL_SERVICE:", process.env.EMAIL_SERVICE);
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+    console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
 
     const transporter = nodemailer.createTransport({
       service: process.env.EMAIL_SERVICE || 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-      }
+      },
+      connectionTimeout: 30000,
+      greetingTimeout: 30000,
+      socketTimeout: 30000
     });
 
+    await transporter.verify();
+    console.log("✅ SMTP Server Ready");
+
+    // your sendMail code here
+
+  } catch (error) {
+    console.error("❌ FULL EMAIL ERROR:");
+    console.error(error);
+  }
+}
     // ONLY PDF attachment - NO LOGO
     const attachments = pdfBuffer ? [
       {
