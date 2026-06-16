@@ -521,6 +521,7 @@ async function generatePDF(submission, customColors = {}) {
 // EMAIL SENDING with Environment Variables
 // ─────────────────────────────────────────
 
+
 async function sendEmail(to, subject, htmlContent, pdfBuffer) {
   try {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -537,6 +538,7 @@ async function sendEmail(to, subject, htmlContent, pdfBuffer) {
         pass: process.env.EMAIL_PASS
       }
     });
+
     // ONLY PDF attachment - NO LOGO
     const attachments = pdfBuffer ? [
       {
