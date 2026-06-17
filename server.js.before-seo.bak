@@ -902,32 +902,6 @@ app.get('/api/admin/config', async (req, res) => {
 // ─────────────────────────────────────────
 // SERVER START
 // ─────────────────────────────────────────
-
-
-// ─────────────────────────────────────────
-// CROSSCUT SEO ROUTES
-// ─────────────────────────────────────────
-app.get('/robots.txt', (req, res) => {
-  res.type('text/plain');
-  res.send(`User-agent: *
-Allow: /
-
-Sitemap: https://crosscut.ddns.net/sitemap.xml`);
-});
-
-app.get('/sitemap.xml', (req, res) => {
-  res.type('application/xml');
-  res.send(`<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://crosscut.ddns.net/</loc>
-    <lastmod>2026-06-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>`);
-});
-
 app.listen(PORT, () => {
   console.log(`\\n╔══════════════════════════════════════╗`);
   console.log(`║  🎬 CROSSCUT Admin Server Running    ║`);
